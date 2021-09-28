@@ -1,0 +1,18 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include hibiscus_connect *.css
+recursive-include hibiscus_connect *.csv
+recursive-include hibiscus_connect *.html
+recursive-include hibiscus_connect *.ico
+recursive-include hibiscus_connect *.js
+recursive-include hibiscus_connect *.json
+recursive-include hibiscus_connect *.md
+recursive-include hibiscus_connect *.png
+recursive-include hibiscus_connect *.py
+recursive-include hibiscus_connect *.svg
+recursive-include hibiscus_connect *.txt
+recursive-exclude hibiscus_connect *.pyc
