@@ -1,0 +1,66 @@
+{
+ "actions": [],
+ "creation": "2021-10-18 22:44:49.354295",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "server",
+  "port",
+  "master_password",
+  "ignore_cert",
+  "test_connection"
+ ],
+ "fields": [
+  {
+   "fieldname": "server",
+   "fieldtype": "Data",
+   "label": "Server"
+  },
+  {
+   "fieldname": "port",
+   "fieldtype": "Data",
+   "label": "Port"
+  },
+  {
+   "fieldname": "master_password",
+   "fieldtype": "Data",
+   "label": "Master Password"
+  },
+  {
+   "fieldname": "test_connection",
+   "fieldtype": "Button",
+   "label": "Test Connection",
+   "options": "test_connection"
+  },
+  {
+   "default": "0",
+   "fieldname": "ignore_cert",
+   "fieldtype": "Check",
+   "label": "Ignore Invalid Certificate"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2021-10-18 22:53:53.851777",
+ "modified_by": "Administrator",
+ "module": "Hibiscus Connect",
+ "name": "Hibiscus Connect Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

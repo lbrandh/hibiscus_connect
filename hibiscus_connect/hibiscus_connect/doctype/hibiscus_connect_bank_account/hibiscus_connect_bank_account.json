@@ -1,0 +1,169 @@
+{
+ "actions": [],
+ "autoname": "field:iban",
+ "creation": "2021-10-19 01:02:37.879166",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "iban",
+  "bic",
+  "kontonummer",
+  "blz",
+  "column_break_5",
+  "bezeichnung",
+  "name1",
+  "saldo_section",
+  "saldo",
+  "saldo_available",
+  "column_break_11",
+  "saldo_datum",
+  "details_section",
+  "unterkonto",
+  "kundennummer",
+  "waehrung",
+  "id",
+  "kommentar"
+ ],
+ "fields": [
+  {
+   "fieldname": "iban",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "IBAN",
+   "read_only": 1,
+   "search_index": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "blz",
+   "fieldtype": "Data",
+   "label": "BLZ",
+   "read_only": 1
+  },
+  {
+   "fieldname": "bezeichnung",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Bezeichnung",
+   "read_only": 1
+  },
+  {
+   "fieldname": "saldo_available",
+   "fieldtype": "Float",
+   "label": "Saldo Available",
+   "read_only": 1
+  },
+  {
+   "fieldname": "saldo",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Saldo",
+   "read_only": 1
+  },
+  {
+   "fieldname": "unterkonto",
+   "fieldtype": "Data",
+   "label": "Unterkonto",
+   "read_only": 1
+  },
+  {
+   "fieldname": "kundennummer",
+   "fieldtype": "Data",
+   "label": "Kundennummer",
+   "read_only": 1
+  },
+  {
+   "fieldname": "kontonummer",
+   "fieldtype": "Data",
+   "label": "Kontonummer",
+   "read_only": 1
+  },
+  {
+   "fieldname": "name1",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "waehrung",
+   "fieldtype": "Data",
+   "label": "W\u00e4hrung",
+   "read_only": 1
+  },
+  {
+   "fieldname": "saldo_datum",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Saldo Datum",
+   "read_only": 1
+  },
+  {
+   "fieldname": "id",
+   "fieldtype": "Data",
+   "label": "Hibiscus ID",
+   "read_only": 1
+  },
+  {
+   "fieldname": "bic",
+   "fieldtype": "Data",
+   "label": "BIC",
+   "read_only": 1
+  },
+  {
+   "fieldname": "kommentar",
+   "fieldtype": "Text",
+   "label": "Hibiscus Kommentar",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "saldo_section",
+   "fieldtype": "Section Break",
+   "label": "Saldo"
+  },
+  {
+   "fieldname": "column_break_11",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "details_section",
+   "fieldtype": "Section Break",
+   "label": "Details"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2021-10-19 01:43:22.427456",
+ "modified_by": "Administrator",
+ "module": "Hibiscus Connect",
+ "name": "Hibiscus Connect Bank Account",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "search_fields": "iban",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "title_field": "iban",
+ "track_changes": 1
+}
