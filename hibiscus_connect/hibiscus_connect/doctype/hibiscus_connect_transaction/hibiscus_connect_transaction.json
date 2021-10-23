@@ -1,0 +1,182 @@
+{
+ "actions": [],
+ "autoname": "HCTRANS-.#####",
+ "creation": "2021-10-21 13:41:13.982297",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "status",
+  "transaktion_section",
+  "art",
+  "betrag",
+  "column_break_3",
+  "customer_ref",
+  "datum",
+  "gegenkonto_section",
+  "empfaenger_blz",
+  "empfaenger_konto",
+  "column_break_9",
+  "empfaenger_name",
+  "section_break_10",
+  "gvcode",
+  "id",
+  "kommentar",
+  "column_break_14",
+  "konto_id",
+  "primanota",
+  "section_break_17",
+  "saldo",
+  "valuta",
+  "column_break_20",
+  "zweck",
+  "zweck_raw"
+ ],
+ "fields": [
+  {
+   "fieldname": "art",
+   "fieldtype": "Data",
+   "label": "Art"
+  },
+  {
+   "fieldname": "betrag",
+   "fieldtype": "Float",
+   "label": "Betrag"
+  },
+  {
+   "fieldname": "customer_ref",
+   "fieldtype": "Data",
+   "label": "Customer Ref"
+  },
+  {
+   "fieldname": "datum",
+   "fieldtype": "Date",
+   "label": "Datum"
+  },
+  {
+   "fieldname": "empfaenger_blz",
+   "fieldtype": "Data",
+   "label": "Gegenkonto BLZ"
+  },
+  {
+   "fieldname": "empfaenger_konto",
+   "fieldtype": "Data",
+   "label": "Gegenkonto Konto"
+  },
+  {
+   "fieldname": "empfaenger_name",
+   "fieldtype": "Data",
+   "label": "Gegenkonto Name"
+  },
+  {
+   "fieldname": "gvcode",
+   "fieldtype": "Data",
+   "label": "GVCode"
+  },
+  {
+   "fieldname": "id",
+   "fieldtype": "Data",
+   "label": "Hibiscus ID"
+  },
+  {
+   "fieldname": "kommentar",
+   "fieldtype": "Data",
+   "label": "Hibiscus Kommentar"
+  },
+  {
+   "fieldname": "konto_id",
+   "fieldtype": "Data",
+   "label": "Konto ID"
+  },
+  {
+   "fieldname": "primanota",
+   "fieldtype": "Data",
+   "label": "Primanota"
+  },
+  {
+   "fieldname": "saldo",
+   "fieldtype": "Float",
+   "label": "Saldo"
+  },
+  {
+   "fieldname": "valuta",
+   "fieldtype": "Date",
+   "label": "Valuta"
+  },
+  {
+   "fieldname": "zweck",
+   "fieldtype": "Small Text",
+   "label": "Zweck"
+  },
+  {
+   "fieldname": "zweck_raw",
+   "fieldtype": "Small Text",
+   "label": "Zweck Raw"
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_10",
+   "fieldtype": "Section Break",
+   "label": "Sonstige Informationen"
+  },
+  {
+   "fieldname": "column_break_14",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_17",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_20",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_9",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "neu\nverbucht"
+  },
+  {
+   "fieldname": "transaktion_section",
+   "fieldtype": "Section Break",
+   "label": "Transaktion"
+  },
+  {
+   "fieldname": "gegenkonto_section",
+   "fieldtype": "Section Break",
+   "label": "Gegenkonto"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2021-10-22 12:59:56.807363",
+ "modified_by": "Administrator",
+ "module": "Hibiscus Connect",
+ "name": "Hibiscus Connect Transaction",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}
