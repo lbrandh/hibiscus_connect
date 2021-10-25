@@ -3,7 +3,7 @@ from hibiscus_connect.hibclient import Hibiscus
 import json
 from pprint import pprint
 from datetime import datetime as dt
-
+from datetime import date, timedelta
 @frappe.whitelist()
 
 def get_accounts_from_hibiscus_server():
@@ -51,13 +51,16 @@ def create_hibiscus_connect_bank_account(hib_acc):
 
 @frappe.whitelist()
 
-def get_transactions_for_account(id, von, bis):
+def get_transactions_for_account(id, von = str(date.today()-timedelta(30)), bis = str(date.today())):
     settings = frappe.get_single("Hibiscus Connect Settings")
     hib = Hibiscus(settings.server, settings.port, settings.master_password, settings.ignore_cert)
     
+    
+    
     von_dt = dt.strptime (von,"%Y-%m-%d")
     bis_dt = dt.strptime (bis,"%Y-%m-%d")
-    
+        
+   
     transactions = hib.get_transactions(id, von_dt,bis_dt)
     check_trans_id = frappe.get_all("Hibiscus Connect Transaction", fields = "id")
     check_trans_id_list = [ x["id"] for x in check_trans_id]
