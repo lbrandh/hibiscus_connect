@@ -1,7 +1,7 @@
 ## Hibiscus Connect
 
-Synchronisation zwischen der ERPNext und der Online-Banking Software Hibiscus
+Austausch zu der Onlinebanking-Software Hibiscus
 
 #### License
 
-GPLv3
+MIT

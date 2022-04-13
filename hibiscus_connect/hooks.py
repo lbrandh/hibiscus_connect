@@ -3,11 +3,11 @@ from . import __version__ as app_version
 app_name = "hibiscus_connect"
 app_title = "Hibiscus Connect"
 app_publisher = "itsdave GmbH"
-app_description = "Synchronisation zwischen der ERPNext und der Online-Banking Software Hibiscus"
+app_description = "Austausch zu der Onlinebanking-Software Hibiscus"
 app_icon = "octicon octicon-file-directory"
 app_color = "grey"
 app_email = "dev@itsdave.de"
-app_license = "GPLv3"
+app_license = "MIT"
 
 # Includes in <head>
 # ------------------
@@ -58,6 +58,12 @@ app_license = "GPLv3"
 
 # before_install = "hibiscus_connect.install.before_install"
 # after_install = "hibiscus_connect.install.after_install"
+
+# Uninstallation
+# ------------
+
+# before_uninstall = "hibiscus_connect.uninstall.before_uninstall"
+# after_uninstall = "hibiscus_connect.uninstall.after_uninstall"
 
 # Desk Notifications
 # ------------------

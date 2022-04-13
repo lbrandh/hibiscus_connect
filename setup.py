@@ -9,7 +9,7 @@ from hibiscus_connect import __version__ as version
 setup(
 	name="hibiscus_connect",
 	version=version,
-	description="Synchronisation zwischen der ERPNext und der Online-Banking Software Hibiscus",
+	description="Austausch zu der Onlinebanking-Software Hibiscus",
 	author="itsdave GmbH",
 	author_email="dev@itsdave.de",
 	packages=find_packages(),
