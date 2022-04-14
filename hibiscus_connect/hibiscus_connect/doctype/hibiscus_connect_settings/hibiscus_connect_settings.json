@@ -43,7 +43,7 @@
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2021-10-18 22:53:53.851777",
+ "modified": "2022-04-14 08:24:57.068340",
  "modified_by": "Administrator",
  "module": "Hibiscus Connect",
  "name": "Hibiscus Connect Settings",
@@ -56,6 +56,16 @@
    "print": 1,
    "read": 1,
    "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "Banking Manager",
    "share": 1,
    "write": 1
   }

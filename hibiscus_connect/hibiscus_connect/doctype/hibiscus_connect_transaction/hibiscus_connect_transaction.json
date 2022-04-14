@@ -30,7 +30,9 @@
   "valuta",
   "column_break_20",
   "zweck",
-  "zweck_raw"
+  "zweck_raw",
+  "automatisierung_section",
+  "protokoll"
  ],
  "fields": [
   {
@@ -157,11 +159,21 @@
    "fieldname": "gegenkonto_section",
    "fieldtype": "Section Break",
    "label": "Gegenkonto"
+  },
+  {
+   "fieldname": "automatisierung_section",
+   "fieldtype": "Section Break",
+   "label": "Automatisierung"
+  },
+  {
+   "fieldname": "protokoll",
+   "fieldtype": "Long Text",
+   "label": "Protokoll"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-10-25 10:16:34.741130",
+ "modified": "2022-04-14 08:26:35.748108",
  "modified_by": "Administrator",
  "module": "Hibiscus Connect",
  "name": "Hibiscus Connect Transaction",
@@ -176,6 +188,29 @@
    "read": 1,
    "report": 1,
    "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Banking User",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Banking Manager",
    "share": 1,
    "write": 1
   }
