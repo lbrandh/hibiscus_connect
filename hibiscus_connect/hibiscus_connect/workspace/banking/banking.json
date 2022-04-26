@@ -1,6 +1,15 @@
 {
  "category": "Modules",
- "charts": [],
+ "charts": [
+  {
+   "chart_name": "Unverbuchte Zahlungseing\u00e4nge",
+   "label": "unverbuchte Zahlungseing\u00e4nge"
+  },
+  {
+   "chart_name": "offene Ausgangsrechnungen",
+   "label": "offene Ausgangsrechnungen"
+  }
+ ],
  "creation": "2022-04-13 21:01:44.326175",
  "developer_mode_only": 0,
  "disable_user_customization": 0,
@@ -14,7 +23,7 @@
  "is_standard": 1,
  "label": "Banking",
  "links": [],
- "modified": "2022-04-13 21:02:51.978540",
+ "modified": "2022-04-26 08:10:11.730565",
  "modified_by": "Administrator",
  "module": "Hibiscus Connect",
  "name": "Banking",
