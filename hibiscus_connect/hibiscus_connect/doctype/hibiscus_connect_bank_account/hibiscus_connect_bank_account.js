@@ -24,6 +24,7 @@ frappe.ui.form.on('Hibiscus Connect Bank Account', {
 						method: 'hibiscus_connect.tools.get_transactions_for_account', 
 						args: {
 							id: frm.doc.id,
+							account: frm.doc.name,
 							von: values.von,
 							bis: values.bis
 						 },

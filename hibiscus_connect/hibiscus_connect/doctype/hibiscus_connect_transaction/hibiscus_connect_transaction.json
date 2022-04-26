@@ -32,7 +32,8 @@
   "zweck",
   "zweck_raw",
   "automatisierung_section",
-  "protokoll"
+  "protokoll",
+  "konto"
  ],
  "fields": [
   {
@@ -111,6 +112,7 @@
   {
    "fieldname": "zweck",
    "fieldtype": "Small Text",
+   "in_list_view": 1,
    "label": "Zweck"
   },
   {
@@ -148,7 +150,7 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Status",
-   "options": "neu\nverbucht"
+   "options": "neu\nautomatisch verbucht\nmanuell verbucht\nteilweise verbucht\nlegacy verbucht\nabgebrochen"
   },
   {
    "fieldname": "transaktion_section",
@@ -169,11 +171,17 @@
    "fieldname": "protokoll",
    "fieldtype": "Long Text",
    "label": "Protokoll"
+  },
+  {
+   "fieldname": "konto",
+   "fieldtype": "Link",
+   "label": "Konto",
+   "options": "Hibiscus Connect Bank Account"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-04-14 08:26:35.748108",
+ "modified": "2022-04-25 19:10:34.145190",
  "modified_by": "Administrator",
  "module": "Hibiscus Connect",
  "name": "Hibiscus Connect Transaction",

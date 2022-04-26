@@ -11,7 +11,7 @@ from hibiscus_connect.hibclient import Hibiscus
 class HibiscusConnectSettings(Document):
 	@frappe.whitelist()
 	def test_connection(self):
-		hibiscus = Hibiscus(self.server, self.port, self.master_password, self.ignore_cert)
+		hibiscus = Hibiscus(self.server, self.port, self.get_password("hibiscus_master_password"), self.ignore_cert)
 		konto_list = hibiscus.get_accounts()
 		frappe.msgprint(str(konto_list))
 		

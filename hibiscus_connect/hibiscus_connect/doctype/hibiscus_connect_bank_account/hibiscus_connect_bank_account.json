@@ -23,7 +23,9 @@
   "kundennummer",
   "waehrung",
   "id",
-  "kommentar"
+  "kommentar",
+  "erpnext_integration_section",
+  "erpnext_bankkonto"
  ],
  "fields": [
   {
@@ -137,11 +139,22 @@
    "fieldname": "details_section",
    "fieldtype": "Section Break",
    "label": "Details"
+  },
+  {
+   "fieldname": "erpnext_bankkonto",
+   "fieldtype": "Link",
+   "label": "ERPNext Bankkonto",
+   "options": "Account"
+  },
+  {
+   "fieldname": "erpnext_integration_section",
+   "fieldtype": "Section Break",
+   "label": "ERPNext Integration"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-04-14 08:25:53.660311",
+ "modified": "2022-04-25 20:17:01.724968",
  "modified_by": "Administrator",
  "module": "Hibiscus Connect",
  "name": "Hibiscus Connect Bank Account",

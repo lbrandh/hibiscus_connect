@@ -7,9 +7,11 @@
  "field_order": [
   "server",
   "port",
-  "master_password",
+  "hibiscus_master_password",
   "ignore_cert",
-  "test_connection"
+  "test_connection",
+  "einstellungen_f\u00fcr_automatisches_verbuchen_section",
+  "submit_pe"
  ],
  "fields": [
   {
@@ -23,11 +25,6 @@
    "label": "Port"
   },
   {
-   "fieldname": "master_password",
-   "fieldtype": "Data",
-   "label": "Master Password"
-  },
-  {
    "fieldname": "test_connection",
    "fieldtype": "Button",
    "label": "Test Connection",
@@ -38,12 +35,28 @@
    "fieldname": "ignore_cert",
    "fieldtype": "Check",
    "label": "Ignore Invalid Certificate"
+  },
+  {
+   "fieldname": "hibiscus_master_password",
+   "fieldtype": "Password",
+   "label": "Hibiscus Master Password"
+  },
+  {
+   "default": "0",
+   "fieldname": "submit_pe",
+   "fieldtype": "Check",
+   "label": "Payment Entries buchen"
+  },
+  {
+   "fieldname": "einstellungen_f\u00fcr_automatisches_verbuchen_section",
+   "fieldtype": "Section Break",
+   "label": "Einstellungen f\u00fcr automatisches Verbuchen"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2022-04-14 08:24:57.068340",
+ "modified": "2022-04-25 22:03:30.338126",
  "modified_by": "Administrator",
  "module": "Hibiscus Connect",
  "name": "Hibiscus Connect Settings",
