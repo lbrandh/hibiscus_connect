@@ -113,7 +113,9 @@ def match_payment(hib_trans, sinvs=None):
         "zweck": hib_trans_doc.zweck,
         "account": hib_trans_doc.konto,
         "erpnext_bankkonto": frappe.get_doc("Hibiscus Connect Bank Account", hib_trans_doc.konto),
-        "hib_trans_doc": hib_trans_doc
+        "hib_trans_doc": hib_trans_doc,
+        "sinvs": [],
+        "sinvs_loose": []
         }
     if not sinvs:
         sinvs = _get_unpaid_sinv_numbers()
@@ -233,8 +235,11 @@ def _get_grand_totals(sinv_list):
     return round(grand_total_sum,2)
 
 def make_payment_entry(matching_list, settings=None):
+    print(matching_list)
     if not settings:
         settings = frappe.get_single("Hibiscus Connect Settings")
+
+
 
     pe_doc = frappe.get_doc({
         "doctype": "Payment Entry",
@@ -254,7 +259,10 @@ def make_payment_entry(matching_list, settings=None):
         "referneces": []
     })
 
-    for sinv in matching_list["sinvs"]:
+    todo = list(matching_list["sinvs"])
+    todo.extend(x for x in matching_list["sinvs_loose"] if x not in todo)
+
+    for sinv in todo:
         reference_doc_response = _get_payment_entry_reference(sinv)
        
         #Kundennummer setzen wenn bisher leer
@@ -264,6 +272,14 @@ def make_payment_entry(matching_list, settings=None):
         #Fehler, wenn eine bereits befüllte Kundenummer verändert werden soll
         if pe_doc.party != reference_doc_response["sinv_doc"].customer:
             frappe.throw("Verschiedene Kundenummern in automatisiert zugeordneten Rechnungen.")
+
+        #Debitoren Konte anhand Rechnungskonto setzen
+        if pe_doc.paid_from == "":
+            pe_doc.paid_from = reference_doc_response["sinv_doc"].debit_to
+        #Fehler, wenn mehrere Debitoren Konten in einem PE angesprochen werden würden
+        if pe_doc.paid_from != reference_doc_response["sinv_doc"].debit_to:
+            frappe.throw("Verschiedene debitoren Konten in einem Payment Entry. Das wird nicht unterstützt. Zahlung muss manuell in mehreren Payment Entries verbucht werden.")
+
 
         pe_doc.append("references", reference_doc_response["reference_doc"])
     
