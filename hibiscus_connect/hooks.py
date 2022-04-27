@@ -109,7 +109,7 @@ app_license = "MIT"
 scheduler_events = {
 	 	"hourly": [
  		"hibiscus_connect.tasks.fetch_transactions_from_active_accounts"
- 	],
+		]
 }
 
 # scheduler_events = {
@@ -154,6 +154,7 @@ scheduler_events = {
 # auto_cancel_exempted_doctypes = ["Auto Repeat"]
 
 
+
 # User Data Protection
 # --------------------
 
@@ -185,3 +186,6 @@ user_data_fields = [
 # 	"hibiscus_connect.auth.validate"
 # ]
 
+fixtures = [
+	"Hibiscus Connect Transaction Category"
+]
