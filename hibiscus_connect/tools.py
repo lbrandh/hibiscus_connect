@@ -61,7 +61,7 @@ def create_hibiscus_connect_bank_account(hib_acc):
 
 @frappe.whitelist()
 
-def get_transactions_for_account(id, account, von = str(date.today()-timedelta(30)), bis = str(date.today())):
+def get_transactions_for_account(account, von = str(date.today()-timedelta(30)), bis = str(date.today())):
     settings = frappe.get_single("Hibiscus Connect Settings")
     hib = Hibiscus(settings.server, settings.port, settings.get_password("hibiscus_master_password"), settings.ignore_cert)
 
@@ -72,7 +72,7 @@ def get_transactions_for_account(id, account, von = str(date.today()-timedelta(3
     von_dt = dt.strptime (von,"%Y-%m-%d")
     bis_dt = dt.strptime (bis,"%Y-%m-%d")
         
-    transactions = hib.get_transactions(id, von_dt,bis_dt)
+    transactions = hib.get_transactions(account_doc.id, von_dt,bis_dt)
     check_trans_id = frappe.get_all("Hibiscus Connect Transaction", fields = "id")
     check_trans_id_list = [ x["id"] for x in check_trans_id]
     
@@ -238,8 +238,6 @@ def make_payment_entry(matching_list, settings=None):
     print(matching_list)
     if not settings:
         settings = frappe.get_single("Hibiscus Connect Settings")
-
-
 
     pe_doc = frappe.get_doc({
         "doctype": "Payment Entry",

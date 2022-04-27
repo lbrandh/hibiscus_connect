@@ -25,7 +25,8 @@
   "id",
   "kommentar",
   "erpnext_integration_section",
-  "erpnext_bankkonto"
+  "erpnext_bankkonto",
+  "fetch_periodically"
  ],
  "fields": [
   {
@@ -150,11 +151,17 @@
    "fieldname": "erpnext_integration_section",
    "fieldtype": "Section Break",
    "label": "ERPNext Integration"
+  },
+  {
+   "default": "0",
+   "fieldname": "fetch_periodically",
+   "fieldtype": "Check",
+   "label": "st\u00fcndliches Abrufen aktiv"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-04-25 20:17:01.724968",
+ "modified": "2022-04-27 21:16:07.467721",
  "modified_by": "Administrator",
  "module": "Hibiscus Connect",
  "name": "Hibiscus Connect Bank Account",

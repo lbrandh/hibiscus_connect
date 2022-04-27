@@ -106,6 +106,12 @@ app_license = "MIT"
 # Scheduled Tasks
 # ---------------
 
+scheduler_events = {
+	 	"hourly": [
+ 		"hibiscus_connect.tasks.fetch_transactions_from_active_accounts"
+ 	],
+}
+
 # scheduler_events = {
 # 	"all": [
 # 		"hibiscus_connect.tasks.all"
