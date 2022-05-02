@@ -1,6 +1,3 @@
-from cmath import sin
-from pydoc import doc
-from bs4 import Doctype
 import frappe
 from hibiscus_connect.hibclient import Hibiscus
 import json
@@ -11,6 +8,7 @@ from frappe.model.naming import set_name_by_naming_series, get_default_naming_se
 import re
 from pprint import pprint
 from numpy import append
+from pyparsing import Regex
 
 from razorpay import Payment
 
@@ -100,14 +98,18 @@ def match_hibiscus_transaction(hib_trans):
     if result["sinvs_matched_loose"]:
         make_payment_entry(result)
         return "Erfolgreich verbucht loose"
+    if result["sinvs_matched_cust"]:
+        make_payment_entry(result)
+        return "Erfolgreich verbucht Kunde"
     frappe.throw("Zahlung konnte nicht automatisiert verbucht werden.")
     
 
-def match_payment(hib_trans, sinvs=None):
+def match_payment(hib_trans, sinvs=None, sinv_names=None):
     hib_trans_doc = frappe.get_doc("Hibiscus Connect Transaction", hib_trans)
     matching_list = {
         "sinvs_matched_strict": False,
         "sinvs_matched_loose": False,
+        "sinvs_matched_cust": False,
         "totals_matched": False,
         "betrag": hib_trans_doc.betrag,
         "zweck": hib_trans_doc.zweck,
@@ -115,12 +117,16 @@ def match_payment(hib_trans, sinvs=None):
         "erpnext_bankkonto": frappe.get_doc("Hibiscus Connect Bank Account", hib_trans_doc.konto),
         "hib_trans_doc": hib_trans_doc,
         "sinvs": [],
-        "sinvs_loose": []
+        "sinvs_loose": [],
+        "cust": "", #Zuordnung der Transaktion zu einem Kunden
+        "sinvs_cust": []
         }
     if not sinvs:
         sinvs = _get_unpaid_sinv_numbers()
+    if not sinv_names:
+        sinv_names = _get_unpaid_sinv_names()
     #Kriterien, die zum verbuchen herangezogen werden:
-    #1.) Zweck enthällt mindesten eine Rechnungsnummer im vollständigen format
+    #1.) Zweck enthällt mindesten eine Rechnungsnummer einer unbezahlten Rechnung im vollständigen format
     matching_list["sinvs"] = _get_sinv_names(hib_trans_doc.zweck, sinvs)
     if matching_list["sinvs"]:
         matching_list["totals"] = _get_grand_totals(matching_list["sinvs"])
@@ -129,22 +135,37 @@ def match_payment(hib_trans, sinvs=None):
             matching_list["sinvs_matched_strict"] = True
             matching_list["totals_matched"] = True
             return matching_list
+    #2.) Zweck enthällt mindestens eine Rechnungsnummer einer unbezahlten Rechnung im unvollständigen Format (auch ohne Naming Series Prefix)
     matching_list["sinvs_loose"] = _advanced_si_match(hib_trans_doc.zweck, sinvs)
     if matching_list["sinvs_loose"]:
         matching_list["totals"] = _get_grand_totals(matching_list["sinvs_loose"])
+        #2.1) Wenn zusätzlich der Betrag übereinstimmt, können wir verbuchen
         if hib_trans_doc.betrag == matching_list["totals"]:
             matching_list["sinvs_matched_loose"] = True
             matching_list["totals_matched"] = True
             return matching_list
+    #3.) Zweck enthällt eine Kundenummer einer unbezahlten Rechnung (auch ohne Naming Series Prefix)
+    matching_list["cust"] = _cust_match(hib_trans_doc.zweck, sinv_names)
+    if matching_list["cust"] != "":
+        #3.1 Rechnunen ermitteln, deren Summe dem Betrag entspricht.
+        matching_list["sinvs_cust"] = find_matching_invoices_for_customer_payment(hib_trans_doc, sinv_names, matching_list["cust"])
+        print("hier######")
+        print(matching_list["sinvs_cust"])
+        if matching_list["sinvs_cust"]:
+            matching_list["sinvs_matched_cust"] = True
+            matching_list["totals_matched"] = True
+            return matching_list
+    
     return matching_list
 
     
     
-
+@frappe.whitelist()
 def match_all_payments(von = str(date.today()-timedelta(30)), bis = str(date.today())):
     stats = {
         "sinvs_matched_strict": 0,
         "sinvs_matched_loose": 0,
+        "sinvs_matched_cust": 0,
         "totals_matched": 0,
         "payments_processed": 0
         }
@@ -167,12 +188,17 @@ def match_all_payments(von = str(date.today()-timedelta(30)), bis = str(date.tod
         if result["sinvs_matched_loose"]:
             stats["sinvs_matched_loose"] += 1
             make_payment_entry(result)
+        if result["sinvs_matched_cust"]:
+            stats["sinvs_matched_cust"] += 1
+            print(result)
+            make_payment_entry(result)
         if result["totals_matched"]:
             stats["totals_matched"] += 1
         else:
             debug_data(result)
     
     pprint(stats)
+    return get_text_from_stats(stats)
 
 def debug_data(result):
     print("--------------------")
@@ -192,18 +218,102 @@ def _advanced_si_match(zweck, sinvs):
                 si_list.append(sinv_name)
     return si_list
 
+def _cust_match(zweck, sinvs):
+    si_list = []
+    cust_list = []
+    sinv_doc_list = frappe.get_all("Sales Invoice", filters={
+        "name": ["in", sinvs]
+    }, fields=[
+        "name", "customer"
+    ])
+    for sinv_el in sinv_doc_list:
+        if str(sinv_el["customer"]).lower() not in cust_list:
+            cust_list.append(str(sinv_el["customer"]).lower())
+    regex = "|".join(cust_list)
+    zweck = zweck.replace(" ","")
+    zweck = str(zweck).lower()
+    match_regex_customer =re.findall(regex, zweck)
+    if match_regex_customer:
+        if len(match_regex_customer) > 1:
+            frappe.throw("Mehr als eine Kundenummern im Verwendungszweck gefunden.")
+        return match_regex_customer[0]
+    else:
+        return False
+
+
+def find_matching_invoices_for_customer_payment(hib_trans_doc, sinv_names, customer):
+    sinv_doc_list = frappe.get_all("Sales Invoice", filters={
+        "name": ["in", sinv_names],
+        "grand_total": ["<=", float(hib_trans_doc.betrag)],
+        "customer": customer
+    }, fields=[
+        "name", "customer", "grand_total"
+    ], order_by="name asc")
+    #Prüfen, ob die offenen Rechungsbeträge in irgendeiner Kombination dem Zahlbetrag entsprechen
+    combined_totals = combine_totals(hib_trans_doc.betrag, sinv_doc_list)
+    matched_sinvs = []
+    if combined_totals:
+        for ct in combined_totals:
+            for sinv in sinv_doc_list:
+                if ct == sinv["grand_total"]:
+                    if sinv["name"] not in matched_sinvs:
+                        matched_sinvs.append(sinv["name"])
+    
+    return matched_sinvs
+
+
+def combine_totals(sum, sinvs): #gibt ggf. eine Liste an Beträgen zurück, die summiert den Zahlbetrag ergeben
+    #Summen aller Rechnungen sammeln
+    sinv_totals = []
+    for sinv in sinvs:
+        sinv_totals.append(sinv["grand_total"])
+
+    result = subset_sum(sinv_totals, sum)
+    if result:
+        return result
+    else:
+        return None
+
+#stolen from https://stackoverflow.com/questions/34517540/find-all-combinations-of-a-list-of-numbers-with-a-given-sum  and adapted afterwards  
+def subset_sum(numbers, target, partial=[]): #Ermittelt mögliche Kombinatiinen der Rechnungssummen
+    s = sum(partial)
+    # check if the partial sum is equals to target
+    if round(s,3) == target:
+        print("sum(%s)=%s" % (partial, target))
+        return partial
+    if s > target:
+        return # if we reach the number why bother to continue
+    for i in range(len(numbers)):
+        n = numbers[i]
+        remaining = numbers[i + 1:]
+        result = subset_sum(remaining, target, partial + [n])
+        if result:
+            return result
+
+def get_sinvs_for_matched_totals(totals, sinvs):
+    pass
+
+
 def _get_unpaid_sinv_numbers():
     sinv_numbers = []
     sinvs = frappe.get_all("Sales Invoice", filters={
-        "status": ["not in", ["Paid", "Return", "Partly Paid"]]
-        })
-    sinvs = frappe.get_all("Sales Invoice", filters={
-        "status": ["not in", ["Return"]],
+        "status": ["not in", ["Return", "Paid"]],
         "name": ["not like", "SINV-RET-%"]
         })
     for si in sinvs:
         sinv_numbers.append(str(si["name"]).split("-")[1])
     return sinv_numbers
+
+def _get_unpaid_sinv_names():
+    sinv_numbers = []
+    sinvs = frappe.get_all("Sales Invoice", filters={
+        "status": ["not in", ["Return", "Paid"]],
+        "name": ["not like", "SINV-RET-%"]
+        })
+    for si in sinvs:
+        sinv_numbers.append(str(si["name"]))
+    return sinv_numbers
+
 
         
 def _get_sinv_names(zweck, sinvs=None, extended_matching=True):
@@ -259,6 +369,7 @@ def make_payment_entry(matching_list, settings=None):
 
     todo = list(matching_list["sinvs"])
     todo.extend(x for x in matching_list["sinvs_loose"] if x not in todo)
+    todo.extend(x for x in matching_list["sinvs_cust"] if x not in todo)
 
     for sinv in todo:
         reference_doc_response = _get_payment_entry_reference(sinv)
@@ -276,7 +387,7 @@ def make_payment_entry(matching_list, settings=None):
             pe_doc.paid_from = reference_doc_response["sinv_doc"].debit_to
         #Fehler, wenn mehrere Debitoren Konten in einem PE angesprochen werden würden
         if pe_doc.paid_from != reference_doc_response["sinv_doc"].debit_to:
-            frappe.throw("Verschiedene debitoren Konten in einem Payment Entry. Das wird nicht unterstützt. Zahlung muss manuell in mehreren Payment Entries verbucht werden.")
+            frappe.throw("Verschiedene debitoren Konten in einem Payment Entry. Das wird nicht unterstützt. Zahlung muss manuell in mehreren Payment Entries verbucht werden: " + pe_doc.paid_from + " und " + reference_doc_response["sinv_doc"].debit_to)
 
 
         pe_doc.append("references", reference_doc_response["reference_doc"])
@@ -302,7 +413,24 @@ def _get_payment_entry_reference(sinv):
     })
     return {"reference_doc": reference_doc, "sinv_doc": sinv_doc}
 
+### wip
 
+def get_text_from_stats(stats):
+    return "blub" + str(stats)
+
+@frappe.whitelist()
+def set_andere_einnahme(list):
+    print("#####################")
+    hbt_list = json.loads(list)
+    print(hbt_list)
+    for el in hbt_list:
+        hbdoc = frappe.get_doc("Hibiscus Connect Transaction", el)
+        hbdoc.status = "andere Einnahme"
+        hbdoc.save()
+
+@frappe.whitelist()
+def dump_checked(list):
+    pprint(list)
 
 ###### einmal-methoden für inbetreibnahme
 

@@ -1,5 +1,6 @@
 {
  "actions": [],
+ "allow_copy": 1,
  "autoname": "HCTRANS-.#####",
  "creation": "2021-10-21 13:41:13.982297",
  "doctype": "DocType",
@@ -152,7 +153,7 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Status",
-   "options": "neu\nautomatisch verbucht\nmanuell verbucht\nteilweise verbucht\nlegacy verbucht\nabgebrochen"
+   "options": "neu\nautomatisch verbucht\nmanuell verbucht\nteilweise verbucht\nlegacy verbucht\nabgebrochen\nandere Einnahme"
   },
   {
    "fieldname": "transaktion_section",
@@ -183,7 +184,6 @@
   {
    "fieldname": "kategorie",
    "fieldtype": "Link",
-   "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Kategorie",
    "options": "Hibiscus Connect Transaction Category"
@@ -193,9 +193,10 @@
    "fieldtype": "Column Break"
   }
  ],
+ "in_create": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-04-27 21:56:23.661399",
+ "modified": "2022-05-01 21:29:55.772331",
  "modified_by": "Administrator",
  "module": "Hibiscus Connect",
  "name": "Hibiscus Connect Transaction",
@@ -237,6 +238,7 @@
    "write": 1
   }
  ],
+ "show_preview_popup": 1,
  "sort_field": "modified",
  "sort_order": "DESC",
  "track_changes": 1
