@@ -1,6 +1,5 @@
 {
  "actions": [],
- "allow_copy": 1,
  "autoname": "HCTRANS-.#####",
  "creation": "2021-10-21 13:41:13.982297",
  "doctype": "DocType",
@@ -8,8 +7,6 @@
  "engine": "InnoDB",
  "field_order": [
   "status",
-  "column_break_2",
-  "kategorie",
   "transaktion_section",
   "art",
   "betrag",
@@ -21,6 +18,8 @@
   "empfaenger_konto",
   "column_break_9",
   "empfaenger_name",
+  "customer",
+  "customer_name",
   "section_break_10",
   "gvcode",
   "id",
@@ -48,6 +47,7 @@
    "fieldname": "betrag",
    "fieldtype": "Float",
    "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Betrag"
   },
   {
@@ -75,6 +75,7 @@
    "fieldname": "empfaenger_name",
    "fieldtype": "Data",
    "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Gegenkonto Name"
   },
   {
@@ -153,7 +154,7 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Status",
-   "options": "neu\nautomatisch verbucht\nmanuell verbucht\nteilweise verbucht\nlegacy verbucht\nabgebrochen\nandere Einnahme"
+   "options": "neu\nautomatisch verbucht\nteilweise automatisch verbucht\nmanuell verbucht\nteilweise verbucht\nlegacy verbucht\nabgebrochen\nandere Einnahme"
   },
   {
    "fieldname": "transaktion_section",
@@ -182,21 +183,23 @@
    "options": "Hibiscus Connect Bank Account"
   },
   {
-   "fieldname": "kategorie",
+   "fieldname": "customer",
    "fieldtype": "Link",
-   "in_standard_filter": 1,
-   "label": "Kategorie",
-   "options": "Hibiscus Connect Transaction Category"
+   "label": "Kunde",
+   "options": "Customer"
   },
   {
-   "fieldname": "column_break_2",
-   "fieldtype": "Column Break"
+   "fetch_from": "customer.customer_name",
+   "fieldname": "customer_name",
+   "fieldtype": "Data",
+   "in_standard_filter": 1,
+   "label": "Kunden Name",
+   "read_only": 1
   }
  ],
- "in_create": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-05-01 21:29:55.772331",
+ "modified": "2022-05-17 00:04:31.268782",
  "modified_by": "Administrator",
  "module": "Hibiscus Connect",
  "name": "Hibiscus Connect Transaction",
@@ -238,7 +241,6 @@
    "write": 1
   }
  ],
- "show_preview_popup": 1,
  "sort_field": "modified",
  "sort_order": "DESC",
  "track_changes": 1

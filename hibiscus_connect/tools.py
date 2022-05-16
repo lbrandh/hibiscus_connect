@@ -1,3 +1,7 @@
+from cmath import e
+from ctypes.wintypes import HINSTANCE
+from attr import fields, ib
+from erpnext.accounts.doctype import account
 import frappe
 from hibiscus_connect.hibclient import Hibiscus
 import json
@@ -9,7 +13,7 @@ import re
 from pprint import pprint
 from numpy import append
 from pyparsing import Regex
-
+from frappe.exceptions import DuplicateEntryError, ValidationError
 from razorpay import Payment
 
 @frappe.whitelist()
@@ -75,9 +79,9 @@ def get_transactions_for_account(account, von = str(date.today()-timedelta(30)),
     check_trans_id_list = [ x["id"] for x in check_trans_id]
     
     for hib_trans in transactions:
-        if hib_trans["id"] not in check_trans_id_list: 
+        if hib_trans["id"] not in check_trans_id_list:
             create_hibiscus_connect_transaction(hib_trans, account)
-
+    frappe.db.commit()
 
 def create_hibiscus_connect_transaction(hib_trans, account):
     
@@ -91,17 +95,24 @@ def create_hibiscus_connect_transaction(hib_trans, account):
 
 @frappe.whitelist()
 def match_hibiscus_transaction(hib_trans):
+    payments = frappe.get_all("Hibiscus Connect Transaction", filters={
+        "name": hib_trans
+    }, fields = ["name", "empfaenger_blz", "empfaenger_konto"])
+    hib_trans = payments[0]
     result = match_payment(hib_trans)
     if result["sinvs_matched_strict"]:
-        make_payment_entry(result)
+        pe = make_payment_entry(result)
+        create_bank_account_for_customer(pe.party, hib_trans["empfaenger_konto"], hib_trans["empfaenger_blz"])
         return "Erfolgreich verbucht strict"
     if result["sinvs_matched_loose"]:
-        make_payment_entry(result)
+        pe = make_payment_entry(result)
+        create_bank_account_for_customer(pe.party, hib_trans["empfaenger_konto"], hib_trans["empfaenger_blz"])
         return "Erfolgreich verbucht loose"
     if result["sinvs_matched_cust"]:
-        make_payment_entry(result)
+        pe = make_payment_entry(result)
+        create_bank_account_for_customer(pe.party, hib_trans["empfaenger_konto"], hib_trans["empfaenger_blz"])
         return "Erfolgreich verbucht Kunde"
-    frappe.throw("Zahlung konnte nicht automatisiert verbucht werden.")
+    frappe.throw("Zahlung konnte nicht automatisiert verbucht werden.<br>" + str(result))
     
 
 def match_payment(hib_trans, sinvs=None, sinv_names=None):
@@ -144,12 +155,24 @@ def match_payment(hib_trans, sinvs=None, sinv_names=None):
             matching_list["sinvs_matched_loose"] = True
             matching_list["totals_matched"] = True
             return matching_list
-    #3.) Zweck enthällt eine Kundenummer einer unbezahlten Rechnung (auch ohne Naming Series Prefix)
-    matching_list["cust"] = _cust_match(hib_trans_doc.zweck, sinv_names)
+    #3.) Transaktion wurde einem Kunden zugeordnet
+    if hib_trans_doc.customer:
+        if hib_trans_doc.customer != "":
+            matching_list["cust"] = hib_trans_doc.customer
+
+    #3.1) Zweck enthällt eine Kundenummer einer unbezahlten Rechnung (auch ohne Naming Series Prefix)
+    if matching_list["cust"] == "":
+        matching_list["cust"] = _cust_match(hib_trans_doc.zweck, sinv_names)
+
+    #3.2) Die Bankverbindung ist einem Kunden zugeordnet
+    if matching_list["cust"] == "" or not matching_list["cust"]:
+        acc = frappe.get_all("Bank Account", filters={"iban": hib_trans_doc.empfaenger_konto }, fields=["party"])
+        if acc:
+            matching_list["cust"] = acc[0]["party"]
+
     if matching_list["cust"] != "":
-        #3.1 Rechnunen ermitteln, deren Summe dem Betrag entspricht.
+        #3.3 Rechnunen ermitteln, deren Summe dem Betrag entspricht.
         matching_list["sinvs_cust"] = find_matching_invoices_for_customer_payment(hib_trans_doc, sinv_names, matching_list["cust"])
-        print("hier######")
         print(matching_list["sinvs_cust"])
         if matching_list["sinvs_cust"]:
             matching_list["sinvs_matched_cust"] = True
@@ -171,8 +194,8 @@ def match_all_payments(von = str(date.today()-timedelta(30)), bis = str(date.tod
         }
     payments = frappe.get_all("Hibiscus Connect Transaction", filters={
         "status": "neu",
-        "betrag": [">", 0]
-    })
+        "betrag": [">", 0],
+    }, fields = ["name", "empfaenger_blz", "empfaenger_konto"])
 
     unpaid_sinvs = _get_unpaid_sinv_numbers()
     payments_list = []
@@ -184,14 +207,17 @@ def match_all_payments(von = str(date.today()-timedelta(30)), bis = str(date.tod
         stats["payments_processed"] += 1
         if result["sinvs_matched_strict"]:
             stats["sinvs_matched_strict"] += 1
-            make_payment_entry(result)
+            pe = make_payment_entry(result)
+            create_bank_account_for_customer(pe.party, p["empfaenger_konto"], p["empfaenger_blz"])
         if result["sinvs_matched_loose"]:
             stats["sinvs_matched_loose"] += 1
-            make_payment_entry(result)
+            pe = make_payment_entry(result)
+            create_bank_account_for_customer(pe.party, p["empfaenger_konto"], p["empfaenger_blz"])
         if result["sinvs_matched_cust"]:
             stats["sinvs_matched_cust"] += 1
             print(result)
-            make_payment_entry(result)
+            pe = make_payment_entry(result)
+            create_bank_account_for_customer(pe.party, p["empfaenger_konto"], p["empfaenger_blz"])
         if result["totals_matched"]:
             stats["totals_matched"] += 1
         else:
@@ -344,7 +370,8 @@ def _get_grand_totals(sinv_list):
         grand_total_sum += sinv_doc.grand_total
     return round(grand_total_sum,2)
 
-def make_payment_entry(matching_list, settings=None):
+
+def make_payment_entry(matching_list, settings=None, other_account_sinv = [], current_account_sinv = []):
     print(matching_list)
     if not settings:
         settings = frappe.get_single("Hibiscus Connect Settings")
@@ -371,7 +398,12 @@ def make_payment_entry(matching_list, settings=None):
     todo.extend(x for x in matching_list["sinvs_loose"] if x not in todo)
     todo.extend(x for x in matching_list["sinvs_cust"] if x not in todo)
 
+    todo.sort()
+    print(todo)
     for sinv in todo:
+        if pe_doc.difference_amount == 0:
+            continue
+        
         reference_doc_response = _get_payment_entry_reference(sinv)
        
         #Kundennummer setzen wenn bisher leer
@@ -387,18 +419,27 @@ def make_payment_entry(matching_list, settings=None):
             pe_doc.paid_from = reference_doc_response["sinv_doc"].debit_to
         #Fehler, wenn mehrere Debitoren Konten in einem PE angesprochen werden würden
         if pe_doc.paid_from != reference_doc_response["sinv_doc"].debit_to:
-            frappe.throw("Verschiedene debitoren Konten in einem Payment Entry. Das wird nicht unterstützt. Zahlung muss manuell in mehreren Payment Entries verbucht werden: " + pe_doc.paid_from + " und " + reference_doc_response["sinv_doc"].debit_to)
-
-
+            other_account_sinv.append(sinv)
+            continue
+        print(reference_doc_response["reference_doc"])
         pe_doc.append("references", reference_doc_response["reference_doc"])
-    
+        pe_doc.save()
+
+    if other_account_sinv:
+        return pe_doc
+
     pe_doc.save()
-    
+    matching_list["hib_trans_doc"].customer = pe_doc.party
+    matching_list["hib_trans_doc"].protokoll = pe_doc.remarks
+    matching_list["hib_trans_doc"].save()
+   
     if settings.submit_pe:
         pe_doc.submit()
         matching_list["hib_trans_doc"].status = "automatisch verbucht"
         matching_list["hib_trans_doc"].save()
-
+       
+    return pe_doc
+    
 
 def _get_payment_entry_reference(sinv):
     sinv_doc = frappe.get_doc("Sales Invoice", sinv)
@@ -448,3 +489,40 @@ def set_lagacy_verbucht():
             ht_doc.status = "legacy verbucht"
             ht_doc.save()
     frappe.db.commit()
+
+@frappe.whitelist()
+def create_bank_account_for_customer(customer, iban, bic):
+    if frappe.get_all("Bank Account", filters={"iban": iban}):
+        return "Bankkonto bereits vorhanden."
+    
+    cdoc = frappe.get_doc("Customer", customer)
+    bank = frappe.get_all("Bank", filters={"swift_number": bic})
+    if not bank:
+        bank = create_unknown_bank(bic).name
+    else:
+        bank = bank[0]["name"]
+    len_ges = len(bank) + len(cdoc.customer_name) + len(iban) + 6
+
+    str_to = 140 - 6 - len(bank) - len(iban)
+    account_name = cdoc.customer_name[0:str_to] + " | " + iban
+
+    badoc = frappe.get_doc({
+        "doctype": "Bank Account",
+        "account_name": account_name,
+        "bank" : bank,
+        "party_type": "Customer",
+        "party": customer,
+        "iban": iban
+        })
+
+    badoc.save()
+    return "Bankkonto erfolgreich erstellt."
+
+def create_unknown_bank(bic):
+    bdoc = frappe.get_doc({
+        "doctype": "Bank",
+        "bank_name": "unknown "+ bic,
+        "swift_number": bic
+    })
+    bdoc.save()
+    return bdoc
