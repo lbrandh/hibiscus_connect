@@ -200,7 +200,9 @@ def match_all_payments(von = str(date.today()-timedelta(30)), bis = str(date.tod
     unpaid_sinvs = _get_unpaid_sinv_numbers()
     payments_list = []
 
+    count = 0
     for p in payments:
+        count += 1
         payments_list.append(p)
         result = match_payment(p.name, sinvs=unpaid_sinvs)
         
@@ -222,6 +224,11 @@ def match_all_payments(von = str(date.today()-timedelta(30)), bis = str(date.tod
             stats["totals_matched"] += 1
         else:
             debug_data(result)
+        
+        frappe.publish_progress(
+			count * 100 / len(payments),
+			title="Verarbeite Zahlungseingänge...",
+		)
     
     pprint(stats)
     return get_text_from_stats(stats)
@@ -371,8 +378,8 @@ def _get_grand_totals(sinv_list):
     return round(grand_total_sum,2)
 
 
-def make_payment_entry(matching_list, settings=None, other_account_sinv = [], current_account_sinv = []):
-    print(matching_list)
+def make_payment_entry(matching_list, settings=None):
+    other_account_sinv = []
     if not settings:
         settings = frappe.get_single("Hibiscus Connect Settings")
 
@@ -419,9 +426,7 @@ def make_payment_entry(matching_list, settings=None, other_account_sinv = [], cu
         #Fehler, wenn mehrere Debitoren Konten in einem PE angesprochen werden würden
         if pe_doc.paid_from != reference_doc_response["sinv_doc"].debit_to:
             other_account_sinv.append(sinv)
-            print("other")
             continue
-        print(reference_doc_response["reference_doc"])
         pe_doc.append("references", reference_doc_response["reference_doc"])
         pe_doc.save()
         if pe_doc.unallocated_amount == 0:
@@ -429,17 +434,29 @@ def make_payment_entry(matching_list, settings=None, other_account_sinv = [], cu
             break
 
     pe_doc.save()
+    print("letztes save")
+    print(pe_doc.total_allocated_amount)
+    print(pe_doc.unallocated_amount)
+    print(pe_doc.difference_amount)
     matching_list["hib_trans_doc"].customer = pe_doc.party
-    matching_list["hib_trans_doc"].protokoll = pe_doc.remarks
     matching_list["hib_trans_doc"].save()
+    matching_list["Payment Entry"] = pe_doc.name
 
-    if other_account_sinv:
-        frappe.msgprint("Zahlung konnte nicht vollständig automatisiert verbucht werden. Es wurden verschiedene Konten angesrpochen." + str(matching_list))
+    if len(other_account_sinv) > 0:
+        frappe.msgprint("Zahlung konnte nicht automatisiert verbucht werden. Es wurden verschiedene Konten angesrpochen.<br>" + dict_to_html_ul(matching_list,2))
         return pe_doc
-
    
     if settings.submit_pe:
+        if pe_doc.difference_amount != 0:
+            frappe.msgprint("Zahlung konnte nicht automatisiert verbucht werden. Es kamen mehrere identische Beträge in Frage.<br>" + dict_to_html_ul(matching_list,2))
+            return pe_doc
+        
+        if round(pe_doc.unallocated_amount + pe_doc.total_allocated_amount, 2) != pe_doc.paid_amount:
+            frappe.msgprint("Zahlung konnte nicht automatisiert verbucht werden. Es gibt noch unzugeordnete Beträge.<br>" + dict_to_html_ul(matching_list,2))
+            return pe_doc
+
         pe_doc.submit()
+        matching_list["hib_trans_doc"].protokoll = pe_doc.remarks
         matching_list["hib_trans_doc"].status = "automatisch verbucht"
         matching_list["hib_trans_doc"].save()
        
@@ -531,3 +548,14 @@ def create_unknown_bank(bic):
     })
     bdoc.save()
     return bdoc
+
+        
+def dict_to_html_ul(dd, level=0):
+    text = '<ul>'
+    import json
+    for k, v in dd.items():
+        text += '<li><b>%s</b>: %s</li>' % (k, dict_to_html_ul(v, level+1) if isinstance(v, dict) else (json.dumps(v) if isinstance(v, list) else v))
+    text += '</ul>'
+    return text
+
+
