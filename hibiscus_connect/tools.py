@@ -401,8 +401,7 @@ def make_payment_entry(matching_list, settings=None, other_account_sinv = [], cu
     todo.sort()
     print(todo)
     for sinv in todo:
-        if pe_doc.difference_amount == 0:
-            continue
+        print("processing " + sinv)
         
         reference_doc_response = _get_payment_entry_reference(sinv)
        
@@ -420,18 +419,24 @@ def make_payment_entry(matching_list, settings=None, other_account_sinv = [], cu
         #Fehler, wenn mehrere Debitoren Konten in einem PE angesprochen werden würden
         if pe_doc.paid_from != reference_doc_response["sinv_doc"].debit_to:
             other_account_sinv.append(sinv)
+            print("other")
             continue
         print(reference_doc_response["reference_doc"])
         pe_doc.append("references", reference_doc_response["reference_doc"])
         pe_doc.save()
-
-    if other_account_sinv:
-        return pe_doc
+        if pe_doc.unallocated_amount == 0:
+            print("pe_doc.unallocated_amount = 0")
+            break
 
     pe_doc.save()
     matching_list["hib_trans_doc"].customer = pe_doc.party
     matching_list["hib_trans_doc"].protokoll = pe_doc.remarks
     matching_list["hib_trans_doc"].save()
+
+    if other_account_sinv:
+        frappe.msgprint("Zahlung konnte nicht vollständig automatisiert verbucht werden. Es wurden verschiedene Konten angesrpochen." + str(matching_list))
+        return pe_doc
+
    
     if settings.submit_pe:
         pe_doc.submit()
