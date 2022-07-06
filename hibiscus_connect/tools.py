@@ -406,6 +406,7 @@ def make_payment_entry(matching_list, settings=None):
     todo.extend(x for x in matching_list["sinvs_cust"] if x not in todo)
 
     todo.sort()
+    error = ""
     print(todo)
     for sinv in todo:
         print("processing " + sinv)
@@ -418,7 +419,8 @@ def make_payment_entry(matching_list, settings=None):
             pe_doc.party_name = frappe.get_value(doctype="Customer", filters={"name": pe_doc.party}, fieldname="customer_name"),
         #Fehler, wenn eine bereits befüllte Kundenummer verändert werden soll
         if pe_doc.party != reference_doc_response["sinv_doc"].customer:
-            frappe.throw("Verschiedene Kundenummern in automatisiert zugeordneten Rechnungen.")
+            error += "Verschiedene Kundenummern in automatisiert zugeordneten Rechnungen.<br>"
+            break
 
         #Debitoren Konte anhand Rechnungskonto setzen
         if pe_doc.paid_from == "":
@@ -428,19 +430,27 @@ def make_payment_entry(matching_list, settings=None):
             other_account_sinv.append(sinv)
             continue
         pe_doc.append("references", reference_doc_response["reference_doc"])
-        pe_doc.save()
-        if pe_doc.unallocated_amount == 0:
-            print("pe_doc.unallocated_amount = 0")
-            break
+        try:
+            pe_doc.save()
+            if pe_doc.unallocated_amount == 0:
+                print("pe_doc.unallocated_amount = 0")
+                break
 
-    pe_doc.save()
-    print("letztes save")
-    print(pe_doc.total_allocated_amount)
-    print(pe_doc.unallocated_amount)
-    print(pe_doc.difference_amount)
-    matching_list["hib_trans_doc"].customer = pe_doc.party
-    matching_list["hib_trans_doc"].save()
-    matching_list["Payment Entry"] = pe_doc.name
+        except Exception as e:
+            error += "<p>" + repr(e) + "</p>"
+    
+    if error:
+        frappe.msgprint(error + dict_to_html_ul(matching_list,2))
+        return pe_doc
+    else:
+        pe_doc.save()
+        print("letztes save")
+        print(pe_doc.total_allocated_amount)
+        print(pe_doc.unallocated_amount)
+        print(pe_doc.difference_amount)
+        matching_list["hib_trans_doc"].customer = pe_doc.party
+        matching_list["hib_trans_doc"].save()
+        matching_list["Payment Entry"] = pe_doc.name
 
     if len(other_account_sinv) > 0:
         frappe.msgprint("Zahlung konnte nicht automatisiert verbucht werden. Es wurden verschiedene Konten angesrpochen.<br>" + dict_to_html_ul(matching_list,2))
