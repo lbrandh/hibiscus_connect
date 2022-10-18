@@ -1,0 +1,139 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "SEPAM-.#####",
+ "creation": "2022-10-13 10:58:49.904554",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "status",
+  "konto_section",
+  "konto",
+  "column_break_4",
+  "konto_id",
+  "gegenkonto_section",
+  "customer",
+  "blz",
+  "column_break_9",
+  "gegenkonto_name",
+  "kontonummer",
+  "section_break_12",
+  "endtoendid",
+  "mandateid",
+  "creditorid",
+  "sigdate",
+  "sepatype"
+ ],
+ "fields": [
+  {
+   "fieldname": "customer",
+   "fieldtype": "Link",
+   "label": "Customer",
+   "options": "Customer"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "new\nactive\ninactive"
+  },
+  {
+   "fieldname": "konto",
+   "fieldtype": "Link",
+   "label": "Konto",
+   "options": "Hibiscus Connect Bank Account"
+  },
+  {
+   "fieldname": "blz",
+   "fieldtype": "Data",
+   "label": "BIC Gegenkonto"
+  },
+  {
+   "fieldname": "kontonummer",
+   "fieldtype": "Data",
+   "label": "IBAN Gegenkonto"
+  },
+  {
+   "fieldname": "endtoendid",
+   "fieldtype": "Data",
+   "label": "End to end id"
+  },
+  {
+   "fieldname": "mandateid",
+   "fieldtype": "Data",
+   "label": "Mandats Referenz"
+  },
+  {
+   "fieldname": "creditorid",
+   "fieldtype": "Data",
+   "label": "Gl\u00e4ubiger Identifikation"
+  },
+  {
+   "fieldname": "sigdate",
+   "fieldtype": "Data",
+   "label": "Unterschriftsdatum des Mandats"
+  },
+  {
+   "fieldname": "sepatype",
+   "fieldtype": "Data",
+   "label": "Lastschrift Art"
+  },
+  {
+   "fieldname": "gegenkonto_name",
+   "fieldtype": "Data",
+   "label": "Inhaber Name Gegenkonto"
+  },
+  {
+   "fieldname": "konto_section",
+   "fieldtype": "Section Break",
+   "label": "Konto"
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "konto_id",
+   "fieldtype": "Data",
+   "label": "Konto ID"
+  },
+  {
+   "fieldname": "gegenkonto_section",
+   "fieldtype": "Section Break",
+   "label": "Gegenkonto"
+  },
+  {
+   "fieldname": "column_break_9",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_12",
+   "fieldtype": "Section Break"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2022-10-18 12:22:19.149198",
+ "modified_by": "Administrator",
+ "module": "Hibiscus Connect",
+ "name": "SEPA Lastschrift Mandat",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

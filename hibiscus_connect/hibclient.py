@@ -30,6 +30,10 @@ class Hibiscus():
         transactions = self.client.hibiscus.xmlrpc.umsatz.list(params)
         return transactions
 
+    def get_debit_charge(self,params):
+        debit_charge = self.client.hibiscus.xmlrpc.sepalastschrift.create(params)
+        #debit_charge = self.client.hibiscus.xmlrpc.sepaueberweisung.find()
+        return debit_charge
 
 
             

@@ -1,5 +1,5 @@
 from cmath import e
-from ctypes.wintypes import HINSTANCE
+#from ctypes.wintypes import HINSTANCE
 from attr import fields, ib
 from erpnext.accounts.doctype import account
 import frappe
@@ -504,6 +504,45 @@ def set_andere_einnahme(list):
 @frappe.whitelist()
 def dump_checked(list):
     pprint(list)
+
+def create_debit_charge(sinv):
+    invoice = frappe.get_doc("Sales Invoice", sinv)
+    customer = invoice.customer
+    # date = invoice.due_date
+    # termin = dt.strftime(date, "d%.m%.Y%")
+    # print(customer, date, termin)
+    customer_name = invoice.customer_name
+    sepa_mandat = frappe.get_all("SEPA Lastschrift Mandat",
+                                filters = {
+                                    "status": "active",
+                                    "customer":customer
+                                    },
+                                fields = ['konto', 'konto_id', 'blz','gegenkonto_name','gegenkonto_name', 'kontonummer']
+    )
+
+    print(len(sepa_mandat))
+    if len(sepa_mandat) == 1:
+        params =  {"betrag": str(invoice.grand_total),
+                "termin": str(invoice.due_date),
+                "konto": str(sepa_mandat[0]['konto_id']),
+                "name": str(sepa_mandat[0]['gegenkonto_name']),
+                "blz": str(sepa_mandat[0]['blz']),
+                "kontonummer": str(sepa_mandat[0]['kontonummer']),
+                "verwendungszweck": str(invoice.name)
+                }
+        print(params)
+        settings = frappe.get_single("Hibiscus Connect Settings")
+        hib = Hibiscus(settings.server, settings.port, settings.get_password("hibiscus_master_password"), settings.ignore_cert)
+        deb = hib.get_debit_charge(params)
+    
+    elif len(sepa_mandat) == 0:
+        print("Für den Kunden wurde kein aktives SEPA Mandat gefunden")
+        #frappe.msgprint("Für den Kunden wurde kein aktives SEPA Mandat gefunden") 
+    else:
+        print("Mandat nicht eindeutig, bitte prüfen")
+        #frappe.msgprint("Mandat nicht eindeutig, bitte prüfen")
+    
+
 
 ###### einmal-methoden für inbetreibnahme
 
