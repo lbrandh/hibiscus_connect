@@ -505,43 +505,77 @@ def set_andere_einnahme(list):
 def dump_checked(list):
     pprint(list)
 
-def create_debit_charge(sinv):
-    invoice = frappe.get_doc("Sales Invoice", sinv)
-    customer = invoice.customer
-    # date = invoice.due_date
-    # termin = dt.strftime(date, "d%.m%.Y%")
-    # print(customer, date, termin)
-    customer_name = invoice.customer_name
-    sepa_mandat = frappe.get_all("SEPA Lastschrift Mandat",
-                                filters = {
-                                    "status": "active",
-                                    "customer":customer
-                                    },
-                                fields = ['konto', 'konto_id', 'blz','gegenkonto_name','gegenkonto_name', 'kontonummer']
-    )
+def create_debit_charge(sinv, method=None):
+    print(sinv.name)
+    settings = frappe.get_single("Hibiscus Connect Settings")
+    if settings.debit_charge_active == 0:
+        return
 
-    print(len(sepa_mandat))
-    if len(sepa_mandat) == 1:
-        params =  {"betrag": str(invoice.grand_total),
-                "termin": str(invoice.due_date),
-                "konto": str(sepa_mandat[0]['konto_id']),
-                "name": str(sepa_mandat[0]['gegenkonto_name']),
-                "blz": str(sepa_mandat[0]['blz']),
-                "kontonummer": str(sepa_mandat[0]['kontonummer']),
-                "verwendungszweck": str(invoice.name)
-                }
-        print(params)
-        settings = frappe.get_single("Hibiscus Connect Settings")
-        hib = Hibiscus(settings.server, settings.port, settings.get_password("hibiscus_master_password"), settings.ignore_cert)
-        deb = hib.get_debit_charge(params)
-    
-    elif len(sepa_mandat) == 0:
-        print("Für den Kunden wurde kein aktives SEPA Mandat gefunden")
-        #frappe.msgprint("Für den Kunden wurde kein aktives SEPA Mandat gefunden") 
     else:
-        print("Mandat nicht eindeutig, bitte prüfen")
-        #frappe.msgprint("Mandat nicht eindeutig, bitte prüfen")
-    
+        invoice = frappe.get_doc("Sales Invoice", sinv.name)
+        customer = invoice.customer
+        termin = invoice.due_date - timedelta(days=2)
+        betrag = str(invoice.grand_total).replace(".", ",")
+        payment_terms = invoice.payment_terms_template
+        print("payment_terms")
+        print(payment_terms)
+        if payment_terms == "SEPA Einzug 7 Tage":
+            if invoice.grand_total >0:
+                sepa_mandat = frappe.get_all("SEPA Lastschrift Mandat",
+                                            filters = {
+                                                "status": "active",
+                                                "customer":customer
+                                                },
+                
+                                            )
+
+                print(len(sepa_mandat))
+                if len(sepa_mandat) == 1:
+                    sepa_mandat_doc = frappe.get_doc("SEPA Lastschrift Mandat", sepa_mandat[0]["name"])
+                    print(sepa_mandat_doc.frst, sepa_mandat_doc.final)
+                    if sepa_mandat_doc.frst == 0 and sepa_mandat_doc.final == 0:
+                        sequencetype = "FRST"
+                        sepa_mandat_doc.frst = 1
+                        sepa_mandat_doc.save()
+                    elif sepa_mandat_doc.frst == 1 and sepa_mandat_doc.final == 0:
+                        sequencetype = "RCUR"
+                    elif sepa_mandat_doc.final == 1:
+                        sequencetype = "FNAL"
+                        sepa_mandat_doc.status = "inactive"
+                        sepa_mandat_doc.save()
+                    print(sequencetype)
+                    params =  {"betrag": str(betrag),
+                            "termin": str(termin),
+                            "konto": str(sepa_mandat_doc.konto_id),
+                            "name": str(sepa_mandat_doc.gegenkonto_name),
+                            "blz": str(sepa_mandat_doc.blz),
+                            "kontonummer": str(sepa_mandat_doc.kontonummer),
+                            "verwendungszweck": str(invoice.name),
+                            "creditorid":str(sepa_mandat_doc.creditorid),
+                            "mandateid":str(sepa_mandat_doc.mandateid),
+                            "sigdate":str(sepa_mandat_doc.sigdate),
+                            "sequencetype":str(sequencetype),
+                            "sepatype":str(sepa_mandat_doc.sepatype),
+                            "targetdate": str(invoice.due_date)
+                            
+                            }           
+                    print(params)
+                    
+                    hib = Hibiscus(settings.server, settings.port, settings.get_password("hibiscus_master_password"), settings.ignore_cert)
+                    deb = hib.get_debit_charge(params)
+                    print(deb)
+                    if not deb:
+                        frappe.msgprint("Es wurde eine SEPA-Lastschrift erzeugt")
+                    else:
+                        frappe.msgprint(deb)
+                
+                elif len(sepa_mandat) == 0:
+                    print("Für den Kunden wurde kein aktives SEPA Mandat gefunden")
+                    #frappe.msgprint("Für den Kunden wurde kein aktives SEPA Mandat gefunden") 
+                else:
+                    print("Mandat nicht eindeutig, bitte prüfen")
+                    #frappe.msgprint("Mandat nicht eindeutig, bitte prüfen")
+            
 
 
 ###### einmal-methoden für inbetreibnahme

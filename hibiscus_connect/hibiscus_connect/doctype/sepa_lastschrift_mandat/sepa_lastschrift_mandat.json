@@ -10,8 +10,9 @@
   "status",
   "konto_section",
   "konto",
-  "column_break_4",
   "konto_id",
+  "column_break_4",
+  "creditorid",
   "gegenkonto_section",
   "customer",
   "blz",
@@ -19,11 +20,14 @@
   "gegenkonto_name",
   "kontonummer",
   "section_break_12",
-  "endtoendid",
+  "mandat_section",
   "mandateid",
-  "creditorid",
+  "sepatype",
+  "frst",
+  "column_break_17",
   "sigdate",
-  "sepatype"
+  "endtoendid",
+  "final"
  ],
  "fields": [
   {
@@ -40,9 +44,9 @@
   },
   {
    "fieldname": "konto",
-   "fieldtype": "Link",
+   "fieldtype": "Data",
    "label": "Konto",
-   "options": "Hibiscus Connect Bank Account"
+   "read_only": 1
   },
   {
    "fieldname": "blz",
@@ -62,22 +66,26 @@
   {
    "fieldname": "mandateid",
    "fieldtype": "Data",
-   "label": "Mandats Referenz"
+   "label": "Mandats Referenz",
+   "read_only": 1
   },
   {
    "fieldname": "creditorid",
    "fieldtype": "Data",
-   "label": "Gl\u00e4ubiger Identifikation"
+   "label": "Gl\u00e4ubiger Identifikation",
+   "read_only": 1
   },
   {
    "fieldname": "sigdate",
-   "fieldtype": "Data",
+   "fieldtype": "Date",
    "label": "Unterschriftsdatum des Mandats"
   },
   {
+   "default": "B2B",
    "fieldname": "sepatype",
-   "fieldtype": "Data",
-   "label": "Lastschrift Art"
+   "fieldtype": "Select",
+   "label": "Lastschrift Art",
+   "options": "CORE\nCOR1\nB2B"
   },
   {
    "fieldname": "gegenkonto_name",
@@ -87,7 +95,7 @@
   {
    "fieldname": "konto_section",
    "fieldtype": "Section Break",
-   "label": "Konto"
+   "label": "Creditor"
   },
   {
    "fieldname": "column_break_4",
@@ -96,12 +104,13 @@
   {
    "fieldname": "konto_id",
    "fieldtype": "Data",
-   "label": "Konto ID"
+   "label": "Konto ID",
+   "read_only": 1
   },
   {
    "fieldname": "gegenkonto_section",
    "fieldtype": "Section Break",
-   "label": "Gegenkonto"
+   "label": "Debitor"
   },
   {
    "fieldname": "column_break_9",
@@ -110,11 +119,32 @@
   {
    "fieldname": "section_break_12",
    "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "mandat_section",
+   "fieldtype": "Section Break",
+   "label": "Mandat"
+  },
+  {
+   "fieldname": "column_break_17",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "frst",
+   "fieldtype": "Check",
+   "label": "Erstmalige Lastschrift erfolgt"
+  },
+  {
+   "default": "0",
+   "fieldname": "final",
+   "fieldtype": "Check",
+   "label": "Letztmalige Lastschrift"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-10-18 12:22:19.149198",
+ "modified": "2022-10-25 09:16:11.913954",
  "modified_by": "Administrator",
  "module": "Hibiscus Connect",
  "name": "SEPA Lastschrift Mandat",

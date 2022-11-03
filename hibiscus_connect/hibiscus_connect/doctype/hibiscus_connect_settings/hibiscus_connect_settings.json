@@ -10,8 +10,16 @@
   "hibiscus_master_password",
   "ignore_cert",
   "test_connection",
+  "creditor_section",
+  "konto",
+  "konto_id",
+  "column_break_9",
+  "creditorid",
   "einstellungen_f\u00fcr_automatisches_verbuchen_section",
-  "submit_pe"
+  "submit_pe",
+  "einstellungen_sepa_lastschrift",
+  "debit_charge_active",
+  "sepa_zahlungsweise"
  ],
  "fields": [
   {
@@ -51,12 +59,54 @@
    "fieldname": "einstellungen_f\u00fcr_automatisches_verbuchen_section",
    "fieldtype": "Section Break",
    "label": "Einstellungen f\u00fcr automatisches Verbuchen"
+  },
+  {
+   "fieldname": "einstellungen_sepa_lastschrift",
+   "fieldtype": "Section Break",
+   "label": "Einstellungen f\u00fcr SEPA-Lastschrift"
+  },
+  {
+   "default": "0",
+   "fieldname": "debit_charge_active",
+   "fieldtype": "Check",
+   "label": "SEPA Lastschrift Export aktiv"
+  },
+  {
+   "fieldname": "creditor_section",
+   "fieldtype": "Section Break",
+   "label": "Creditor"
+  },
+  {
+   "fieldname": "konto",
+   "fieldtype": "Data",
+   "label": "Konto"
+  },
+  {
+   "fieldname": "konto_id",
+   "fieldtype": "Data",
+   "label": "Konto ID"
+  },
+  {
+   "fieldname": "column_break_9",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "creditorid",
+   "fieldtype": "Data",
+   "label": "Gl\u00e4ubiger Identifikation"
+  },
+  {
+   "fieldname": "sepa_zahlungsweise",
+   "fieldtype": "Link",
+   "label": "Sepa Zahlungsweise",
+   "options": "Payment Terms Template"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2022-04-25 22:03:30.338126",
+ "migration_hash": "4d92f4743b26f8fb78f6f4ccd074e7fb",
+ "modified": "2022-11-03 12:56:35.440760",
  "modified_by": "Administrator",
  "module": "Hibiscus Connect",
  "name": "Hibiscus Connect Settings",
