@@ -1,0 +1,169 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "SEPAM-.#####",
+ "creation": "2022-10-13 10:58:49.904554",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "status",
+  "konto_section",
+  "konto",
+  "konto_id",
+  "column_break_4",
+  "creditorid",
+  "gegenkonto_section",
+  "customer",
+  "blz",
+  "column_break_9",
+  "gegenkonto_name",
+  "kontonummer",
+  "section_break_12",
+  "mandat_section",
+  "mandateid",
+  "sepatype",
+  "frst",
+  "column_break_17",
+  "sigdate",
+  "endtoendid",
+  "final"
+ ],
+ "fields": [
+  {
+   "fieldname": "customer",
+   "fieldtype": "Link",
+   "label": "Customer",
+   "options": "Customer"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "new\nactive\ninactive"
+  },
+  {
+   "fieldname": "konto",
+   "fieldtype": "Data",
+   "label": "Konto",
+   "read_only": 1
+  },
+  {
+   "fieldname": "blz",
+   "fieldtype": "Data",
+   "label": "BIC Gegenkonto"
+  },
+  {
+   "fieldname": "kontonummer",
+   "fieldtype": "Data",
+   "label": "IBAN Gegenkonto"
+  },
+  {
+   "fieldname": "endtoendid",
+   "fieldtype": "Data",
+   "label": "End to end id"
+  },
+  {
+   "fieldname": "mandateid",
+   "fieldtype": "Data",
+   "label": "Mandats Referenz",
+   "read_only": 1
+  },
+  {
+   "fieldname": "creditorid",
+   "fieldtype": "Data",
+   "label": "Gl\u00e4ubiger Identifikation",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sigdate",
+   "fieldtype": "Date",
+   "label": "Unterschriftsdatum des Mandats"
+  },
+  {
+   "default": "B2B",
+   "fieldname": "sepatype",
+   "fieldtype": "Select",
+   "label": "Lastschrift Art",
+   "options": "CORE\nCOR1\nB2B"
+  },
+  {
+   "fieldname": "gegenkonto_name",
+   "fieldtype": "Data",
+   "label": "Inhaber Name Gegenkonto"
+  },
+  {
+   "fieldname": "konto_section",
+   "fieldtype": "Section Break",
+   "label": "Creditor"
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "konto_id",
+   "fieldtype": "Data",
+   "label": "Konto ID",
+   "read_only": 1
+  },
+  {
+   "fieldname": "gegenkonto_section",
+   "fieldtype": "Section Break",
+   "label": "Debitor"
+  },
+  {
+   "fieldname": "column_break_9",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_12",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "mandat_section",
+   "fieldtype": "Section Break",
+   "label": "Mandat"
+  },
+  {
+   "fieldname": "column_break_17",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "frst",
+   "fieldtype": "Check",
+   "label": "Erstmalige Lastschrift erfolgt"
+  },
+  {
+   "default": "0",
+   "fieldname": "final",
+   "fieldtype": "Check",
+   "label": "Letztmalige Lastschrift"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2022-10-25 09:16:11.913954",
+ "modified_by": "Administrator",
+ "module": "Hibiscus Connect",
+ "name": "SEPA Lastschrift Mandat",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

@@ -1,4 +1,5 @@
 from . import __version__ as app_version
+import hibiscus_connect
 
 app_name = "hibiscus_connect"
 app_title = "Hibiscus Connect"
@@ -95,8 +96,11 @@ app_license = "MIT"
 # ---------------
 # Hook on document methods and events
 
-# doc_events = {
-# 	"*": {
+doc_events = {
+	"Sales Invoice": {
+		"on_submit":"hibiscus_connect.tools.create_debit_charge"
+	}
+}
 # 		"on_update": "method",
 # 		"on_cancel": "method",
 # 		"on_trash": "method"
