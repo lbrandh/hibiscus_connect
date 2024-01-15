@@ -54,13 +54,15 @@
   },
   {
    "fieldname": "saldo_available",
-   "fieldtype": "Float",
+   "fieldtype": "Currency",
+   "options": "currency",
    "label": "Saldo Available",
    "read_only": 1
   },
   {
    "fieldname": "saldo",
-   "fieldtype": "Float",
+   "fieldtype": "Currency",
+   "options": "currency",
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Saldo",

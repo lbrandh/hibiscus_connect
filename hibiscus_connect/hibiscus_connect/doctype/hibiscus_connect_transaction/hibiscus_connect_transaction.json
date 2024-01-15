@@ -45,7 +45,8 @@
   },
   {
    "fieldname": "betrag",
-   "fieldtype": "Float",
+   "fieldtype": "Currency",
+   "options": "currency",
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Betrag"
@@ -105,7 +106,8 @@
   },
   {
    "fieldname": "saldo",
-   "fieldtype": "Float",
+   "fieldtype": "Currency",
+   "options": "currency",
    "label": "Saldo"
   },
   {

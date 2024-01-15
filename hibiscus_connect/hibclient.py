@@ -7,7 +7,7 @@ class Hibiscus():
 
     def __init__(self, server, port, master_password, ignore_cert = 0):
         if ignore_cert == 1:
-            self.client = xc.Server("https://admin:" + master_password + "@" + server + ":" + port + "/xmlrpc", context=ssl._create_unverified_context())
+            self.client = xc.Server("http://admin:" + master_password + "@" + server + ":" + port + "/xmlrpc", context=ssl._create_unverified_context())
         else:
             self.client = xc.Server("https://admin:" + master_password + "@" + server + ":" + port + "/xmlrpc")
     

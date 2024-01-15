@@ -11,7 +11,7 @@ from datetime import date, timedelta
 from frappe.model.naming import set_name_by_naming_series, get_default_naming_series
 import re
 from pprint import pprint
-from numpy import append
+#from numpy import append
 from pyparsing import Regex
 from frappe.exceptions import DuplicateEntryError, ValidationError
 from razorpay import Payment
@@ -56,8 +56,14 @@ def create_accounts(dialog_accounts):
 def create_hibiscus_connect_bank_account(hib_acc):
     hib_acc["doctype"] = "Hibiscus Connect Bank Account"
     hib_acc["name1"] = hib_acc.pop("name")
-    hib_acc["saldo_available"] = float(str(hib_acc["saldo_available"]).replace(".","").replace(",","."))
-    hib_acc["saldo"] = float(str(hib_acc["saldo"]).replace(".","").replace(",","."))
+    try:
+        hib_acc["saldo_available"] = float(str(hib_acc["saldo_available"]).replace(".","").replace(",","."))
+    except ValueError:
+        hib_acc["saldo_available"] = 0.0
+    try:
+        hib_acc["saldo"] = float(str(hib_acc["saldo"]).replace(".","").replace(",","."))
+    except ValueError:
+        hib_acc["saldo"] = 0.0
     hib_acc_doc = frappe.get_doc(hib_acc)
     hib_acc_doc.save()
 
